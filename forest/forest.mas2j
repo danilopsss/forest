@@ -1,0 +1,8 @@
+MAS forest {
+
+    environment: csck504.ForestEnv(0)
+
+    agents: hero_SAMPLE_SOLUTION; goblin;
+
+    aslSourcePath: "src/agt";
+}
