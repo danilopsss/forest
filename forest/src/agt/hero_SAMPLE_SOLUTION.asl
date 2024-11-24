@@ -6,10 +6,11 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 
 // Initial goal
 !started.
-!pick(coin).
-!pick(gem).
-!pick(vase).
-!find_goblin.
+!get_coin.
+!next_item.
+!get_vase.
+!get_gem.
+// !find_goblin.
 
 /*
 * In the event that the agent must achieve "started", under all circumstances, print the message.
@@ -18,37 +19,38 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
    :true
    <- .print("I'm not scared of that smelly Goblin!").
 
-+!pick(coin)
-   :coin(hero)
-   <- stash(coin);
-      .print("I've found the coin!").
-+!pick(coin)
-   :not pos(hero, 7, 7)
-   <- next(slot);
-      !pick(coin).
 
-+!pick(gem)
-   :gem(hero)
-   <- stash(gem);
-      .print("I've found the gem!").
-+!pick(gem)
-   :not pos(hero, 7, 7)
++!get_coin
+   : coin(hero)
+   <- .print("I've found the coin!");
+      pick(coin);
+      stash(coin);
+      !get_vase.
++!get_coin
+   : not(coin(hero))
    <- next(slot);
-      !pick(gem).
+      .wait(2000);
+      !get_coin.
 
-+!pick(vase)
-   :vase(hero)
-   <- stash(vase);
-      .print("I've found the vase!").
-+!pick(vase)
-   :not pos(hero, 7, 7)
++!get_vase
+   : vase(hero)
+   <- .print("I've found the vase!");
+      pick(vase);
+      stash(vase);
+      !get_gem.
++!get_vase
+   : not(vase(hero))
    <- next(slot);
-      !pick(vase).
+      .wait(2000);
+      !get_vase.
 
-+!find_goblin
-   : pos(hero, X, Y) & pos(goblin, X, Y)
-   <- .print("I've found the goblin").
-+!find_goblin
-   :pos(hero, X1, Y1) & pos(goblin, X2, Y2) & (X1 == X2 & Y1 == Y2)
++!get_gem
+   : gem(hero)
+   <- .print("I've found the gemget_gem!");
+      pick(gem);
+      stash(gem).
++!get_gem
+   : not(gem(hero))
    <- next(slot);
-      !find_goblin.
+      .wait(2000);
+      !get_gem.
