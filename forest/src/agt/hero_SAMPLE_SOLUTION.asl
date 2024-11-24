@@ -7,9 +7,8 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 // Initial goal
 !started.
 !get_coin.
-!next_item.
-!get_vase.
-!get_gem.
+// !get_vase.
+// !get_gem.
 // !find_goblin.
 
 /*
@@ -29,7 +28,7 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 +!get_coin
    : not(coin(hero))
    <- next(slot);
-      .wait(2000);
+      .wait(700);
       !get_coin.
 
 +!get_vase
@@ -41,16 +40,39 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 +!get_vase
    : not(vase(hero))
    <- next(slot);
-      .wait(2000);
+      .wait(700);
       !get_vase.
 
 +!get_gem
    : gem(hero)
    <- .print("I've found the gemget_gem!");
       pick(gem);
-      stash(gem).
+      stash(gem);
+      !find_goblin.
 +!get_gem
    : not(gem(hero))
    <- next(slot);
-      .wait(2000);
+      .wait(700);
       !get_gem.
+
++!find_goblin
+   : pos(hero, X, Y) & pos(goblin, X, Y)
+   <- .print("Hello Mr Goblin, here are your items.");
+      drop(coin);
+      drop(gem);
+      drop(vase);
+      !go_back_home.
++!find_goblin
+   : not(pos(hero, X, Y) & pos(goblin, X, Y))
+   <- move_towards(4, 4);
+      .wait(700);
+      !find_goblin.
+
++!go_back_home
+   : pos(hero, 0, 0)
+   <- .print("That was tyring...").
++!go_back_home
+   : not(pos(hero, 0, 0) & pos(hero(X, Y)))
+   <- move_towards(0, 0);
+      .wait(700);
+   !go_back_home.
