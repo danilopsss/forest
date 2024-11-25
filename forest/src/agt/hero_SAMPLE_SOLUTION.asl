@@ -7,6 +7,10 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 // Here we check If we have all the items
 have_all_items(N) :- total_coins(1) & total_gems(1) & total_vases(1).
 
+// to track the last visited slot
+last_visited(X, Y).
+
+// to count my items
 total_coins(0).
 total_gems(0).
 total_vases(0).
@@ -25,9 +29,9 @@ total_vases(0).
 +!find_items
    : coin(hero) | vase(hero) | gem(hero)
    <- 
-   if (coin(hero)) {.print("I've found the coin!"); !get_coin};
-   if (vase(hero)) {.print("I've found the vase!"); !get_vase};
-   if (gem(hero)) {.print("I've found the gem!"); !get_gem}.
+   if (coin(hero)) { .print("I've found the coin!"); !get_coin };
+   if (vase(hero)) { .print("I've found the vase!"); !get_vase };
+   if (gem(hero)) { .print("I've found the gem!"); !get_gem }.
 +!find_items
    : not(have_all_items(N)) & not(pos(hero, 7, 7))
    <- next(slot);
@@ -102,7 +106,7 @@ total_vases(0).
 
 +!go_back_home
    : pos(hero, 0, 0)
-   <- .print("That was tyring...").
+   <- .print("I am tired...").
 +!go_back_home
    : not(pos(hero, 0, 0) & pos(hero(X, Y)))
    <- move_towards(0, 0);
