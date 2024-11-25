@@ -4,12 +4,16 @@
 // Hero is at the position of agent P (variable), if agent P's position is identical to Hero's position
 at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 
+// Here we check If we have all the items
+have_all_items(N) :- total_coins(1) & total_gems(1) & total_vases(1).
+
+total_coins(0).
+total_gems(0).
+total_vases(0).
+
 // Initial goal
 !started.
-!get_coin.
-// !get_vase.
-// !get_gem.
-// !find_goblin.
+!find_items.
 
 /*
 * In the event that the agent must achieve "started", under all circumstances, print the message.
@@ -18,53 +22,81 @@ at(P) :- pos(P,X,Y) & pos(hero,X,Y).
    :true
    <- .print("I'm not scared of that smelly Goblin!").
 
++!find_items
+   : coin(hero) | vase(hero) | gem(hero)
+   <- 
+   if (coin(hero)) {.print("I've found the coin!"); !get_coin};
+   if (vase(hero)) {.print("I've found the vase!"); !get_vase};
+   if (gem(hero)) {.print("I've found the gem!"); !get_gem}.
++!find_items
+   : not(have_all_items(N)) & not(pos(hero, 7, 7))
+   <- next(slot);
+      .wait(200);
+      !find_items.
++!find_items
+   : not(have_all_items(N)) & pos(hero, 7, 7)
+   <- .print("Well, I couldn't find all the items...");
+      .wait(200);
+      !go_back_home.
++!find_items
+   : have_all_items(N)
+   <- .print("I've found all the items!", N);
+      !find_goblin.
 
 +!get_coin
    : coin(hero)
-   <- .print("I've found the coin!");
-      pick(coin);
-      stash(coin);
-      !get_vase.
-+!get_coin
-   : not(coin(hero))
-   <- next(slot);
-      .wait(700);
-      !get_coin.
+   <- ?total_coins(N);
+      if (N < 1) {
+         -+total_coins(N + 1);
+         pick(coin);
+         stash(coin);
+      } else { 
+         .print("Hmm, I already have this one.");
+         next(slot);
+      }
+      !find_items.
 
 +!get_vase
    : vase(hero)
-   <- .print("I've found the vase!");
-      pick(vase);
-      stash(vase);
-      !get_gem.
-+!get_vase
-   : not(vase(hero))
-   <- next(slot);
-      .wait(700);
-      !get_vase.
+   <- ?total_vases(N);
+      if (N < 1) {
+         -+total_vases(N + 1);
+         pick(vase);
+         stash(vase);
+      } else { 
+         .print("Hmm, I already have this one.");
+         next(slot);
+      }
+      !find_items.
 
 +!get_gem
    : gem(hero)
-   <- .print("I've found the gemget_gem!");
-      pick(gem);
-      stash(gem);
-      !find_goblin.
-+!get_gem
-   : not(gem(hero))
-   <- next(slot);
-      .wait(700);
-      !get_gem.
+   <- ?total_gems(N);
+     if (N < 1) {
+         -+total_gems(N + 1);
+         pick(gem);
+         stash(gem);
+      } else { 
+         .print("Hmm, I already have this one.");
+         next(slot);
+      }
+      !find_items.
 
 +!find_goblin
-   : pos(hero, X, Y) & pos(goblin, X, Y)
+   : at(goblin)
    <- .print("Hello Mr Goblin, here are your items.");
+      .print("Your coin...");
       drop(coin);
+      .print("Your gem...");
       drop(gem);
+      .print("Your vase...");
       drop(vase);
+      .print("See ya!");
       !go_back_home.
 +!find_goblin
-   : not(pos(hero, X, Y) & pos(goblin, X, Y))
-   <- move_towards(4, 4);
+   : not(at(goblin))
+   <- ?pos(goblin, X, Y);
+      move_towards(X, Y);
       .wait(700);
       !find_goblin.
 
