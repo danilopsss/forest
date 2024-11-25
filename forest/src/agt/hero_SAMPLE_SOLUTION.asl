@@ -42,6 +42,7 @@ total_vases(0).
    <- ?pos(hero, X, Y);
       -+last_visited(X, Y);
       next(slot);
+      !teleport_portal_check;
       .wait(200);
       !find_items.
 +!find_items
@@ -53,6 +54,26 @@ total_vases(0).
    : have_all_items(N)
    <- .print("I've found all the items!", N);
       !find_goblin.
+
++!teleport_portal_check
+   : true 
+   <- ?pos(hero, X, Y);
+      ?last_visited(LX, LY);
+      if (LX \== X  & LY \== Y ) {
+         move_towards(X, Y);
+         .wait(700);
+         !position_after_portal
+      }.
+
++!position_after_portal
+   : true
+   <- ?pos(hero, X, Y);
+      ?last_visited(LX, LY);
+      if (X > LX + 1 & Y > LY) {
+         move_towards(LX + 1, LY);
+         !position_after_portal
+      }.
+
 
 +!get_coin
    : coin(hero)
