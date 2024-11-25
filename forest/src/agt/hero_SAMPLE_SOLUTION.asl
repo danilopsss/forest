@@ -5,7 +5,12 @@
 at(P) :- pos(P,X,Y) & pos(hero,X,Y).
 
 // Here we check If we have all the items
+at_home :- pos(hero, 0, 0).
+cant_find_all_items :- not(have_all_items(N)) & reached_the_end(hero).
 have_all_items(N) :- total_coins(1) & total_gems(1) & total_vases(1).
+keep_looking :- not(have_all_items(N)) & not(reached_the_end(hero)).
+not_at_home :- not(pos(hero, 0, 0) & pos(hero(X, Y))).
+reached_the_end(P) :- pos(P, 7, 7).
 
 // to track the last visited slot
 last_visited(X, Y).
@@ -33,12 +38,14 @@ total_vases(0).
    if (vase(hero)) { .print("I've found the vase!"); !get_vase };
    if (gem(hero)) { .print("I've found the gem!"); !get_gem }.
 +!find_items
-   : not(have_all_items(N)) & not(pos(hero, 7, 7))
-   <- next(slot);
+   : keep_looking
+   <- ?pos(hero, X, Y);
+      -+last_visited(X, Y);
+      next(slot);
       .wait(200);
       !find_items.
 +!find_items
-   : not(have_all_items(N)) & pos(hero, 7, 7)
+   : cant_find_all_items
    <- .print("Well, I couldn't find all the items...");
       .wait(200);
       !go_back_home.
@@ -105,10 +112,10 @@ total_vases(0).
       !find_goblin.
 
 +!go_back_home
-   : pos(hero, 0, 0)
+   : at_home
    <- .print("I am tired...").
 +!go_back_home
-   : not(pos(hero, 0, 0) & pos(hero(X, Y)))
+   : not_at_home
    <- move_towards(0, 0);
       .wait(700);
    !go_back_home.
